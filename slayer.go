@@ -13,24 +13,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Redacted string
-
-func (s Redacted) String() string {
-	var o string
-	for _, _ = range s {
-		o += "\u2022"
-	}
-
-	return o
-}
-
 type conf struct {
 	Auth auth
 }
 
 type auth struct {
-	User  string   `toml:"user"`
-	Token Redacted `toml:"token"`
+	User  string `toml:"user"`
+	Token string `toml:"token"`
 }
 
 func (a auth) String() string {
@@ -66,8 +55,15 @@ func main() {
 	}).Debug("loaded config")
 
 	t1 := fmt.Sprintf("%s:%s", conf.Auth.User, conf.Auth.Token)
+	log.WithFields(log.Fields{
+		"user:token": t1,
+	}).Debug("token gen phase 1")
+
 	t2 := []byte(t1)
 	authToken := base64.StdEncoding.EncodeToString(t2)
+	log.WithFields(log.Fields{
+		"user:token": authToken,
+	}).Debug("token gen phase 2")
 
 	c := http.Client{}
 	req, err := http.NewRequest("GET", BASE+"agile/1.0/board/67/backlog", nil)
@@ -80,6 +76,9 @@ func main() {
 	req.Header.Add("Authorization", "Basic "+authToken)
 	req.Header.Add("Content-Type", "application/json")
 	req.SetBasicAuth(conf.Auth.User, string(conf.Auth.Token))
+	log.WithFields(log.Fields{
+		"headers": req.Header,
+	}).Debug("request prepared")
 
 	resp, err := c.Do(req)
 	defer resp.Body.Close()
@@ -92,9 +91,15 @@ func main() {
 	switch resp.StatusCode {
 	case 401:
 		log.WithFields(log.Fields{
-			"request":  resp.Request,
-			"response": resp,
-		}).Fatal("authorization error")
+			"url":     resp.Request.URL,
+			"headers": resp.Request.Header,
+			"host":    resp.Request.Host,
+		}).Debug("request failed")
+		log.WithFields(log.Fields{
+			"code":    resp.StatusCode,
+			"headers": resp.Header,
+			// "body":    ioutil.ReadAll(resp.Body),
+		}).Error("authorization error")
 		// log.Printf("request: %+v", resp.Request)
 		// log.Printf("response: %+v", resp)
 		// log.Fatalf("authorization issue")
@@ -106,5 +111,7 @@ func main() {
 		// log.Fatalf("unable to read response body: %s", err)
 	}
 
-	log.Debug(string(raw))
+	log.WithFields(log.Fields{
+		"body": string(raw),
+	}).Debug("raw body")
 }
