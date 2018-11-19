@@ -11,13 +11,13 @@ import (
 const BASE = "https://homesmediasolutions.atlassian.net"
 
 var (
-	TOKEN string
 	USER  string
+	TOKEN string
 )
 
 func main() {
-	flag.StringVar(&TOKEN, "token", "", "auth token")
 	flag.StringVar(&USER, "user", "", "username")
+	flag.StringVar(&TOKEN, "token", "", "auth token")
 	flag.Parse()
 
 	tp := jira.BasicAuthTransport{
@@ -26,8 +26,9 @@ func main() {
 	}
 
 	authCtx := log.WithFields(log.Fields{
-		"user": USER,
-		"base": BASE,
+		"user":  USER,
+		"base":  BASE,
+		"token": TOKEN,
 	})
 
 	jc, err := jira.NewClient(tp.Client(), BASE)
@@ -39,9 +40,15 @@ func main() {
 	// proj := "RMXC"
 
 	issues, r, err := jc.Issue.Search("project = RMXC", nil)
-	fmt.Printf("%+v", r.Request)
+	// fmt.Printf("%+v\n", r.Request)
+	// fmt.Printf("%+v\n", r)
 	if err != nil {
-		authCtx.WithError(err).Error("unable to fetch issues")
+		// log.Errorf("%+v", r.Request)
+		// log.Errorf("%+v", r)
+		authCtx.WithFields(log.Fields{
+			"request":  r.Request,
+			"response": r,
+		}).WithError(err).Error("unable to fetch issues")
 		return
 	}
 
