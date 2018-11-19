@@ -40,14 +40,10 @@ func main() {
 	// proj := "RMXC"
 
 	issues, r, err := jc.Issue.Search("project = RMXC", nil)
-	// fmt.Printf("%+v\n", r.Request)
-	// fmt.Printf("%+v\n", r)
 	if err != nil {
-		// log.Errorf("%+v", r.Request)
-		// log.Errorf("%+v", r)
 		authCtx.WithFields(log.Fields{
-			"request":  r.Request,
-			"response": r,
+			"request":  fmt.Sprintf("%+v", r.Request),
+			"response": fmt.Sprintf("%+v", r),
 		}).WithError(err).Error("unable to fetch issues")
 		return
 	}
