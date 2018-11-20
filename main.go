@@ -4,31 +4,33 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/andygrunwald/go-jira"
+	jira "github.com/andygrunwald/go-jira"
 	log "github.com/sirupsen/logrus"
 )
 
+// BASE is the URL for the homes.com Jira instance.
 const BASE = "https://homesmediasolutions.atlassian.net"
 
-var (
-	USER  string
-	TOKEN string
-)
-
 func main() {
-	flag.StringVar(&USER, "user", "", "username")
-	flag.StringVar(&TOKEN, "token", "", "auth token")
+	// conf := flag.String("config", ".slayer", "config file path")
+	user := flag.String("user", "", "username")
+	token := flag.String("token", "", "auth token")
+	debug := flag.Bool("debug", false, "debug mode")
 	flag.Parse()
 
+	if *debug {
+		log.SetLevel(log.DebugLevel)
+	}
+
 	tp := jira.BasicAuthTransport{
-		Username: USER,
-		Password: TOKEN,
+		Username: *user,
+		Password: *token,
 	}
 
 	authCtx := log.WithFields(log.Fields{
-		"user":  USER,
+		"user":  user,
 		"base":  BASE,
-		"token": TOKEN,
+		"token": token,
 	})
 
 	jc, err := jira.NewClient(tp.Client(), BASE)
@@ -36,8 +38,6 @@ func main() {
 		authCtx.WithError(err).Error("unable to create client")
 		return
 	}
-
-	// proj := "RMXC"
 
 	issues, r, err := jc.Issue.Search("project = RMXC", nil)
 	if err != nil {
@@ -48,5 +48,5 @@ func main() {
 		return
 	}
 
-	fmt.Println(issues)
+	fmt.Println(issues[0])
 }
