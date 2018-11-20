@@ -1,10 +1,17 @@
 package sla
 
 import (
+	"errors"
+	"strings"
 	"time"
 
 	jira "github.com/andygrunwald/go-jira"
 	log "github.com/sirupsen/logrus"
+)
+
+var (
+	ErrBadField      = errors.New("unrecognized field")
+	ErrBadConstraint = errors.New("unable to parse constraint")
 )
 
 // Rule is a subcomponent of an SLA.
@@ -26,10 +33,30 @@ func Enforce(rules []Rule, i *jira.Issue) bool {
 	return true
 }
 
+func ParseRule(s string) (Rule, error) {
+	failure := func(i *jira.Issue) bool { return false }
+
+	raw := strings.Split(s, " ")
+	field, constraint := raw[0], strings.Join(raw[1:], " ")
+
+	switch field {
+	case "updated":
+		d, err := time.ParseDuration(constraint)
+		if err != nil {
+			return failure, ErrBadConstraint
+		}
+		return UpdatedWithin(d), nil
+	case "group":
+		return AssignedToGroup(constraint), nil
+	default:
+		return failure, ErrBadField
+	}
+}
+
 // UpdatedWithin asserts that an Issue has been updated with the duration d.
 func UpdatedWithin(d time.Duration) Rule {
 	return func(i *jira.Issue) bool {
-		return time.Now().Sub(time.Time(i.Fields.Updated)) < d
+		return time.Since(time.Time(i.Fields.Updated)) < d
 	}
 }
 
