@@ -78,4 +78,34 @@ func TestRuleApplication(t *testing.T) {
 		}
 
 	})
+	t.Run("group", func(t *testing.T) {
+		var (
+			i jira.Issue
+			f jira.IssueFields
+		)
+		i.Fields = &f
+		i.Fields.Updated = jira.Time(time.Now().AddDate(0, 0, -5))
+
+		cases := []struct {
+			actual   string
+			expected bool
+		}{
+			{"group salesforce", true},
+			{"group Homes Connect", true},
+			{"group nonexistent", false},
+		}
+
+		for _, tt := range cases {
+			r, err := ParseRule(tt.actual)
+
+			if err != nil {
+				t.Logf("received: %s", err)
+				t.Fail()
+			}
+
+			if r(&i) != tt.expected {
+				t.Fail()
+			}
+		}
+	})
 }
