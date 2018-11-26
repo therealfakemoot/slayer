@@ -72,7 +72,7 @@ func TestRuleApplication(t *testing.T) {
 				t.Fail()
 			}
 
-			if r(&i) != tt.expected {
+			if r.Check(i) != tt.expected {
 				t.Fail()
 			}
 		}
@@ -103,7 +103,7 @@ func TestRuleApplication(t *testing.T) {
 				t.Fail()
 			}
 
-			if r(&i) != tt.expected {
+			if r.Check(i) != tt.expected {
 				t.Fail()
 			}
 		}

@@ -2,6 +2,7 @@ package sla
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -14,55 +15,83 @@ var (
 	ErrBadConstraint = errors.New("unable to parse constraint")
 )
 
-// Rule is a subcomponent of an SLA.
-type Rule func(i *jira.Issue) bool
+type RuleSet []Rule
 
-// Enforce applies a set of Rules to an issue. If any Rule returns false, the Issue does not meet SLA.
-func Enforce(rules []Rule, i *jira.Issue) bool {
-	issueCtx := log.WithFields(log.Fields{
-		"key": i.Key,
-	})
+// Apply applies a set of Rules to a set of issues. Returns a Compliance report detailing which rules and which issues did not meet SLA.
+func (rs RuleSet) Apply(issues []jira.Issue) ComplianceReport {
+	var cr ComplianceReport
+	for _, i := range issues {
+		var ic IssueCompliance
+		for _, r := range rs {
+			issueCtx := log.WithFields(log.Fields{
+				"key": i.Key,
+			})
 
-	issueCtx.Debug("enforcing SLA")
-
-	for _, c := range rules {
-		if !c(i) {
-			return false
+			issueCtx.Debug("enforcing SLA")
+			ic[r.Key()] = r.Check(i)
 		}
+		cr[i.Key] = ic
 	}
-	return true
+	return cr
 }
 
+// Rule is a subcomponent of an SLA.
+type Rule struct {
+	Raw   string // original string used to build the rule
+	Check RuleFunc
+}
+
+func (r Rule) Key() string {
+	return r.Raw
+}
+
+type RuleFunc func(i jira.Issue) bool
+
 func ParseRule(s string) (Rule, error) {
-	failure := func(i *jira.Issue) bool { return false }
+	var r Rule
+	r.Raw = s
+
+	failure := func(i jira.Issue) bool { return false }
+	r.Check = failure
 
 	raw := strings.Split(s, " ")
+
 	field, constraint := raw[0], strings.Join(raw[1:], " ")
+
+	parseCtx := log.WithFields(log.Fields{
+		"field":      fmt.Sprintf("%q", field),
+		"constraint": fmt.Sprintf("%q", constraint),
+		"split":      fmt.Sprintf("%q", raw),
+		"original":   fmt.Sprintf("%q", s),
+	})
 
 	switch field {
 	case "updated":
 		d, err := time.ParseDuration(constraint)
 		if err != nil {
-			return failure, ErrBadConstraint
+			return r, ErrBadConstraint
 		}
-		return UpdatedWithin(d), nil
+		r.Check = UpdatedWithin(d)
+		return r, nil
 	case "group":
-		return AssignedToGroup(constraint), nil
+		r.Check = AssignedToGroup(constraint)
+		return r, nil
 	default:
-		return failure, ErrBadField
+		parseCtx.WithError(ErrBadField).Error("rule parse failure")
+		return r, ErrBadField
 	}
 }
 
 // UpdatedWithin asserts that an Issue has been updated with the duration d.
-func UpdatedWithin(d time.Duration) Rule {
-	return func(i *jira.Issue) bool {
+func UpdatedWithin(d time.Duration) RuleFunc {
+	return func(i jira.Issue) bool {
 		return time.Since(time.Time(i.Fields.Updated)) < d
 	}
 }
 
 // AssignedToGroup asserts that an Issue is assigned to a specific development group matching the provided string.
-func AssignedToGroup(g string) Rule {
-	return func(i *jira.Issue) bool {
+func AssignedToGroup(g string) RuleFunc {
+	return func(i jira.Issue) bool {
 		return false
 	}
 }

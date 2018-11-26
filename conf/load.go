@@ -12,8 +12,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func LoadRules(r io.Reader) ([]sla.Rule, error) {
-	var rules []sla.Rule
+func LoadRules(r io.Reader) (sla.RuleSet, error) {
+	var rules sla.RuleSet
 
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
