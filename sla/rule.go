@@ -58,12 +58,12 @@ func ParseRule(s string) (Rule, error) {
 
 	field, constraint := raw[0], strings.Join(raw[1:], " ")
 
-	parseCtx := log.WithFields(log.Fields{
+	log.WithFields(log.Fields{
 		"field":      fmt.Sprintf("%q", field),
 		"constraint": fmt.Sprintf("%q", constraint),
 		"split":      fmt.Sprintf("%q", raw),
 		"original":   fmt.Sprintf("%q", s),
-	})
+	}).Debug("parsing rule")
 
 	switch field {
 	case "updated":
@@ -77,7 +77,6 @@ func ParseRule(s string) (Rule, error) {
 		r.Check = AssignedToGroup(constraint)
 		return r, nil
 	default:
-		parseCtx.WithError(ErrBadField).Error("rule parse failure")
 		return r, ErrBadField
 	}
 }
