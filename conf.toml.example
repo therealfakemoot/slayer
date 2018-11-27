@@ -1,4 +1,12 @@
 [auth]
 user= "your.user"
-token= "8Nkj2CQ9m0sl3m"
-# password= "BadPassword1"
+token = "bad token"
+password= "BadPassword1"
+
+[targets]
+
+[targets.Whatever]
+name = "Activity" # Human friendly name for debugging and reports
+board = 0 # Board ID
+filter = 0 # Filter ID
+rules = ["updated 120h", "group any"] # Please refer to TOML documentation for syntax on arrays
