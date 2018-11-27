@@ -15,14 +15,19 @@ var (
 	ErrBadConstraint = errors.New("unable to parse constraint")
 )
 
-type RuleSet []Rule
+type Target struct {
+	Rules  []Rule
+	Board  int
+	Filter int
+	Name   string
+}
 
 // Apply applies a set of Rules to a set of issues. Returns a Compliance report detailing which rules and which issues did not meet SLA.
-func (rs RuleSet) Apply(issues []jira.Issue) ComplianceReport {
+func (t Target) Apply(issues []jira.Issue) ComplianceReport {
 	var cr ComplianceReport
 	for _, i := range issues {
 		var ic IssueCompliance
-		for _, r := range rs {
+		for _, r := range t.Rules {
 			issueCtx := log.WithFields(log.Fields{
 				"key": i.Key,
 			})
@@ -37,12 +42,27 @@ func (rs RuleSet) Apply(issues []jira.Issue) ComplianceReport {
 
 // Rule is a subcomponent of an SLA.
 type Rule struct {
+	Name  string // describes the ruleset this rule belongs to
 	Raw   string // original string used to build the rule
 	Check RuleFunc
 }
 
 func (r Rule) Key() string {
 	return r.Raw
+}
+
+func (r *Rule) UnmarshalText(text []byte) error {
+	var err error
+
+	parsed, err := ParseRule(string(text))
+	if err != nil {
+		return err
+	}
+
+	r.Name = parsed.Name
+	r.Raw = parsed.Raw
+	r.Check = parsed.Check
+	return nil
 }
 
 type RuleFunc func(i jira.Issue) bool
@@ -90,7 +110,11 @@ func UpdatedWithin(d time.Duration) RuleFunc {
 
 // AssignedToGroup asserts that an Issue is assigned to a specific development group matching the provided string.
 func AssignedToGroup(g string) RuleFunc {
-	return func(i jira.Issue) bool {
+	f := func(i jira.Issue) bool {
+		if strings.ToLower(g) == "any" {
+			return false
+		}
 		return false
 	}
+	return f
 }

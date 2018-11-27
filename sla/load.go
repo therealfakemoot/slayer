@@ -1,32 +1,30 @@
-package conf
+package sla
 
 import (
-	"fmt"
 	"io"
-	"io/ioutil"
-	"strings"
 
 	// "github.com/spf13/viper"
 
-	sla "git.ndumas.com/ndumas/slayer/sla"
+	"github.com/BurntSushi/toml"
 	"github.com/pkg/errors"
 )
 
-func LoadRules(r io.Reader) (sla.RuleSet, error) {
-	var rules sla.RuleSet
+type Auth struct {
+	User     string
+	Token    string
+	Password string
+}
 
-	raw, err := ioutil.ReadAll(r)
+type Config struct {
+	Auth    Auth
+	Targets map[string]Target
+}
+
+func Load(r io.Reader) (c Config, err error) {
+	_, err = toml.DecodeReader(r, &c)
 	if err != nil {
-		return rules, err
+		return c, errors.Wrap(err, "error parsing configuration")
 	}
 
-	for idx, raw := range strings.Split(string(raw), "\n") {
-		r, err := sla.ParseRule(raw)
-		if err != nil {
-			return rules, errors.Wrap(err, fmt.Sprintf("could not parse rule %d", idx))
-		}
-		rules = append(rules, r)
-	}
-
-	return rules, nil
+	return c, nil
 }
