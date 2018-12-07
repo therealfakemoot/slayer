@@ -1,6 +1,8 @@
 package client
 
 import (
+	"fmt"
+
 	jira "github.com/andygrunwald/go-jira"
 
 	sla "git.ndumas.com/ndumas/slayer/sla"
@@ -22,6 +24,10 @@ type ResponseMeta struct {
 type BoardResponse struct {
 	ResponseMeta
 	Issues []jira.Issue
+}
+
+func (br BoardResponse) String() string {
+	return fmt.Sprintf("%d-%d/%d Issues", br.StartAt, br.StartAt+br.MaxResults, br.Total)
 }
 
 type Reporter func([]jira.Issue, []sla.Rule) sla.ComplianceReport

@@ -33,7 +33,7 @@ func (t Target) Apply(issues []jira.Issue) ComplianceReport {
 			})
 
 			issueCtx.Debug("enforcing SLA")
-			ic[r.Key()] = r.Check(i)
+			ic.Rules[r.Key()] = r.Check(i)
 		}
 		cr[i.Key] = ic
 	}
