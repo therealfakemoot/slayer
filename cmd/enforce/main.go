@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sync"
 
 	jira "github.com/andygrunwald/go-jira"
 	log "github.com/sirupsen/logrus"
@@ -24,7 +25,9 @@ func enforce(c *client.Jira, t map[string]sla.Target) sla.ComplianceReport {
 		var ic sla.IssueCompliance
 		ic.Rules = make(map[string]bool)
 		// this may be the time to start using errgroup and goroutines
-		go c.Get(target)
+		var wg sync.WaitGroup
+		go c.Get(target, &wg)
+		wg.Wait()
 
 		for i := range c.Issues {
 			for _, rule := range target.Rules {

@@ -8,10 +8,10 @@ import (
 	sla "git.ndumas.com/ndumas/slayer/sla"
 )
 
-type IssueProvider interface {
-	Get(sla.Target, sla.Auth) ([]jira.Issue, error)
-	Board(sla.Target) ([]jira.Issue, error)
-	Filter(sla.Target) ([]jira.Issue, error)
+type IssueService interface {
+	Get(sla.Target) chan jira.Issue
+	Board(sla.Target) error
+	Filter(sla.Target) error
 }
 
 type ResponseMeta struct {

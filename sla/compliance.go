@@ -53,7 +53,7 @@ func (tr *TermRenderer) Render(cr ComplianceReport) (s string) {
 		tw tabwriter.Writer
 	)
 
-	tw.Init(tr.Out, 15, 4, 0, '\t', 0)
+	tw.Init(tr.Out, 15, 4, 0, ' ', 0)
 	defer tw.Flush()
 
 	/*
