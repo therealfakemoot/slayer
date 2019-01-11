@@ -20,7 +20,7 @@ type Jira struct {
 	Auth   AuthOptions
 	Base   *url.URL
 	Client *http.Client
-	Issues chan jira.Issue
+	Issues chan Issue
 }
 
 func (jc *Jira) Do(req *http.Request) (resp *http.Response, err error) {

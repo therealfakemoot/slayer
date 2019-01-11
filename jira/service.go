@@ -2,7 +2,6 @@ package client
 
 import (
 	"net/http"
-	"sync"
 
 	jira "github.com/andygrunwald/go-jira"
 
@@ -21,20 +20,24 @@ type JiraService struct {
 	Client *http.Client
 }
 
-func (js JiraService) Get(target sla.Target) chan jira.Issue {
-	c := make(chan jira.Issue)
+func (js JiraService) Get(target sla.Target) (issues []jira.Issue) {
+	// this is all garbage
+	/*
+		c := make(chan jira.Issue)
 
-	if target.Board != 0 {
-		for i := range Board(js.Client, target.Board) {
-			c <- i
+		if target.Board != 0 {
+			for i := range Board(js.Client, target.Board) {
+				c <- i
+			}
 		}
-	}
 
-	if target.Filter != 0 {
-		for i := range Filter(js.Client, target.Filter) {
-			c <- i
+		if target.Filter != 0 {
+			for i := range Filter(js.Client, target.Filter) {
+				c <- i
+			}
 		}
-	}
 
-	return c
+		return c
+	*/
+	return issues
 }
