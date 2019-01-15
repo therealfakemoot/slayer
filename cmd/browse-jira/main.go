@@ -2,9 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
-	// "fmt"
-	// "git.ndumas.com/ndumas/slayer/jira"
+	"time"
+
+	client "git.ndumas.com/ndumas/slayer/client"
+	jira "git.ndumas.com/ndumas/slayer/jira"
 )
 
 func main() {
@@ -22,4 +25,9 @@ func main() {
 	if *board != 0 && *filter != 0 {
 		log.Fatal("please select ONLY board or filter, not both")
 	}
+
+	auth := client.AuthOptions{User: *username, Token: *token}
+
+	js := jira.New(auth, "", time.Second*30)
+	fmt.Printf("%+v", js)
 }
