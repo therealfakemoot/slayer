@@ -4,23 +4,21 @@ import (
 	client "git.ndumas.com/ndumas/slayer/client"
 )
 
-type IssueService interface {
-	Get(sla.Target) chan jira.Issue
-	Board(sla.Target) error
-	Filter(sla.Target) error
-}
-
 type Checker struct {
 	Service  *client.IssueService
 	Enforcer Enforcer
-	Renderer ReportRenderer
+	Renderer Renderer
 }
 
-func (c *Checker) Report() string {
-	return c.Renderer.Render(c.Service.Get())
+func (c *Checker) Render() string {
+	return c.Renderer.Render(c.Enforcer.Report(c.Service.Get()))
 }
 
-type ReportRenderer interface {
+func (c *Checker) Report() ComplianceReport {
+	return c.Enforcer.Report(c.Service.Get())
+}
+
+type Renderer interface {
 	Render(ComplianceReport) string
 }
 
