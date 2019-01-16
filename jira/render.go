@@ -15,10 +15,6 @@ var HeaderTemplate = template.Must(template.New("header").Parse("{{$sep := .Sepa
 var RowTemplate = template.Must(template.New("row").Parse("{{$sep := .Separator}}{{$sep}}{{.Issue.Key}}{{$sep}}{{.Issue.Fields.Summary}}{{$sep}}\n"))
 */
 
-type ReportRenderer interface {
-	Render(ComplianceReport) string
-}
-
 type TermRenderer struct {
 	Out io.Writer
 }

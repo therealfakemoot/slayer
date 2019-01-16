@@ -1,7 +1,9 @@
 package client
 
 import (
+	//"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	jira "github.com/andygrunwald/go-jira"
@@ -11,31 +13,43 @@ import (
 	sla "git.ndumas.com/ndumas/slayer/sla"
 )
 
+// JiraService is a provider for issues
+type JiraService struct {
+	Base   *url.URL
+	Auth   client.AuthOptions
+	Client *http.Client
+}
+
 func New(auth client.AuthOptions, base string, duration time.Duration) *JiraService {
 	c := http.Client{
 		Timeout: duration,
 	}
 
+	u, err := url.Parse(base)
+	if err != nil {
+		log.WithError(err).Error("invalid base URL")
+	}
+
 	js := JiraService{
 		Base:   base,
-		Auth:   auth,
+		Auth:   u,
 		Client: &c,
 	}
 
 	return &js
 }
 
-// JiraService is a provider for issues
-type JiraService struct {
-	Base   string
-	Auth   client.AuthOptions
-	Client *http.Client
-}
+func (js *JiraService) prepRequest(target string) (req *http.Request) {
 
-func (js *JiraService) prepRequest(target string) (r *http.Request) {
-	r, _ = http.NewRequest("GET", target, nil)
+	endpoint := js.Base.ResolveReference()
 
-	return r
+	prepCtx := log.WithFields(log.Fields{
+		"endpoint": endpoint,
+	})
+	req, _ = http.NewRequest("GET", endpoint.String(), nil)
+	req.Header.Add("Authorization", "Basic bmljaG9sYXMuZHVtYXNAaG9tZXMuY29tOndLN2tIaU9SS3RmSkd4VFZ3MWwzODIxRQ")
+
+	return req
 }
 
 // Get operates on an SLA Target and retrieves all issues matching those targets.
@@ -66,11 +80,12 @@ func (js JiraService) Get(target sla.Target) (issues []jira.Issue) {
 
 // Board will fetch all issues attached to a given board.
 func (js *JiraService) Board(id int) (issues []jira.Issue, err error) {
+	// boardEndpoint := url.URL{Path: fmt.Sprintf("rest/agile/1.0/board/%d/issue", id)}
 
 	return issues, err
 }
 
-// BoardBacklog will fetch all issues attached to a given board.
+// BoardBacklog will fetch all backlogged issues attached to a given board.
 func (js *JiraService) BoardBacklog(id int) (issues []jira.Issue, err error) {
 
 	return issues, err
@@ -78,6 +93,7 @@ func (js *JiraService) BoardBacklog(id int) (issues []jira.Issue, err error) {
 
 // Filter fetches all issues returned by a specific filter.
 func (js *JiraService) Filter(id int) (issues []jira.Issue, err error) {
+	// filterEndpoint := url.URL{Path: fmt.Sprintf("/api/2/filter/%d", id)}
 
 	return issues, err
 }
