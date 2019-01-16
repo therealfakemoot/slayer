@@ -1,11 +1,13 @@
 package sla
 
-import (
-	client "github.com/therealfakemoot/slayer/client"
-)
+import ()
+
+type IssueService interface {
+	Get()
+}
 
 type Checker struct {
-	Service  *client.IssueService
+	Service  *IssueService
 	Enforcer Enforcer
 	Renderer Renderer
 }
@@ -23,7 +25,7 @@ type Renderer interface {
 }
 
 type Enforcer interface {
-	Report(*client.IssueService) ComplianceReport
+	Report(*IssueService) ComplianceReport
 }
 
 type ComplianceReport map[string]IssueCompliance
