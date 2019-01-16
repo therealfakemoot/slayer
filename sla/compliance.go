@@ -4,6 +4,12 @@ import (
 	client "git.ndumas.com/ndumas/slayer/client"
 )
 
+type IssueService interface {
+	Get(sla.Target) chan jira.Issue
+	Board(sla.Target) error
+	Filter(sla.Target) error
+}
+
 type Checker struct {
 	Service  *client.IssueService
 	Enforcer Enforcer

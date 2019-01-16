@@ -1,4 +1,4 @@
-package client
+package conf
 
 type AuthOptions struct {
 	User     string
