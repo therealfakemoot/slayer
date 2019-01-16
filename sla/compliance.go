@@ -1,28 +1,30 @@
 package sla
 
 import (
-	jira "github.com/andygrunwald/go-jira"
-	// log "github.com/sirupsen/logrus"
-
 	client "git.ndumas.com/ndumas/slayer/client"
 )
 
 type Checker struct {
-	Service  client.IssueService
+	Service  *client.IssueService
 	Enforcer Enforcer
+	Renderer ReportRenderer
+}
+
+func (c *Checker) Report() string {
+	return c.Renderer.Render(c.Service.Get())
+}
+
+type ReportRenderer interface {
+	Render(ComplianceReport) string
 }
 
 type Enforcer interface {
-	Report(client.IssueService) ComplianceReport
+	Report(*client.IssueService) ComplianceReport
 }
 
 type ComplianceReport map[string]IssueCompliance
 
-func (cr ComplianceReport) Render(rr ReportRenderer) (s string) {
-	return rr.Render(cr)
-}
-
 type IssueCompliance struct {
 	Rules map[string]bool
-	Issue jira.Issue
+	Meta  map[string]string
 }
