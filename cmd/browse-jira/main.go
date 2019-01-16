@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	client "git.ndumas.com/ndumas/slayer/client"
-	jira "git.ndumas.com/ndumas/slayer/jira"
+	client "github.com/therealfakemoot/slayer/client"
+	jira "github.com/therealfakemoot/slayer/jira"
 )
 
 func main() {

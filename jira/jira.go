@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	client "git.ndumas.com/ndumas/slayer/client"
+	client "github.com/therealfakemoot/slayer/client"
 )
 
 type Jira struct {

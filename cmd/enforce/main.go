@@ -11,9 +11,9 @@ import (
 	jira "github.com/andygrunwald/go-jira"
 	log "github.com/sirupsen/logrus"
 
-	// conf "git.ndumas.com/ndumas/slayer/conf"
-	client "git.ndumas.com/ndumas/slayer/client"
-	sla "git.ndumas.com/ndumas/slayer/sla"
+	// conf "github.com/therealfakemoot/slayer/conf"
+	client "github.com/therealfakemoot/slayer/client"
+	sla "github.com/therealfakemoot/slayer/sla"
 )
 
 func enforce(c *client.Jira, t map[string]sla.Target) sla.ComplianceReport {

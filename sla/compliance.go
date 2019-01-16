@@ -1,7 +1,7 @@
 package sla
 
 import (
-	client "git.ndumas.com/ndumas/slayer/client"
+	client "github.com/therealfakemoot/slayer/client"
 )
 
 type Checker struct {

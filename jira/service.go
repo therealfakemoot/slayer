@@ -9,8 +9,8 @@ import (
 	jira "github.com/andygrunwald/go-jira"
 	log "github.com/sirupsen/logrus"
 
-	client "git.ndumas.com/ndumas/slayer/client"
-	sla "git.ndumas.com/ndumas/slayer/sla"
+	client "github.com/therealfakemoot/slayer/client"
+	sla "github.com/therealfakemoot/slayer/sla"
 )
 
 // JiraService is a provider for issues

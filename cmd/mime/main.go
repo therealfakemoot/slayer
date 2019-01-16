@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	client "git.ndumas.com/ndumas/slayer/client"
+	client "github.com/therealfakemoot/slayer/client"
 )
 
 func main() {

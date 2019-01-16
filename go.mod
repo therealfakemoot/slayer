@@ -1,4 +1,4 @@
-module git.ndumas.com/ndumas/slayer
+module github.com/therealfakemoot/slayer
 
 require (
 	github.com/BurntSushi/toml v0.3.1
