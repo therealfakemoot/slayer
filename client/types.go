@@ -11,5 +11,3 @@ type IssueService interface {
 	Board(sla.Target) error
 	Filter(sla.Target) error
 }
-
-type Reporter func([]jira.Issue, []sla.Rule) sla.ComplianceReport
