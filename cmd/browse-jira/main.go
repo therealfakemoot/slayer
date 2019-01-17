@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	client "github.com/therealfakemoot/slayer/client"
+	conf "github.com/therealfakemoot/slayer/conf"
 	jira "github.com/therealfakemoot/slayer/jira"
 )
 
@@ -26,7 +26,7 @@ func main() {
 		log.Fatal("please select ONLY board or filter, not both")
 	}
 
-	auth := client.AuthOptions{User: *username, Token: *token}
+	auth := conf.AuthOptions{User: *username, Token: *token}
 
 	js := jira.New(auth, "", time.Second*30)
 	fmt.Printf("%+v", js)
