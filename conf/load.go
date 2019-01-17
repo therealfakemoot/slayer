@@ -5,13 +5,12 @@ import (
 
 	"github.com/BurntSushi/toml"
 	log "github.com/sirupsen/logrus"
-
-	client "github.com/therealfakemoot/slayer/client"
 )
 
-func LoadAuth(r io.Reader) (ac client.AuthConfig) {
-	if _, err := toml.DecodeReader(r, ac); err != nil {
+func LoadAuth(r io.Reader) (ao AuthOptions) {
+	var f Full
+	if _, err := toml.DecodeReader(r, &f); err != nil {
 		log.WithError(err).Error("unable to load auth data")
 	}
-	return ac
+	return f.Auth
 }
