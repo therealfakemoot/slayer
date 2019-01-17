@@ -1,4 +1,4 @@
-package client
+package jira
 
 import (
 	"encoding/json"
@@ -13,11 +13,11 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	client "github.com/therealfakemoot/slayer/client"
+	conf "github.com/therealfakemoot/slayer/conf"
 )
 
 type Jira struct {
-	Auth   client.AuthOptions
+	Auth   conf.AuthOptions
 	Base   *url.URL
 	Client *http.Client
 	Issues chan jira.Issue

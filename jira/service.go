@@ -1,4 +1,4 @@
-package client
+package jira
 
 import (
 	//"fmt"
@@ -9,18 +9,18 @@ import (
 	jira "github.com/andygrunwald/go-jira"
 	log "github.com/sirupsen/logrus"
 
-	client "github.com/therealfakemoot/slayer/client"
+	conf "github.com/therealfakemoot/slayer/conf"
 	sla "github.com/therealfakemoot/slayer/sla"
 )
 
 // JiraService is a provider for issues
 type JiraService struct {
 	Base   *url.URL
-	Auth   client.AuthOptions
+	Auth   conf.AuthOptions
 	Client *http.Client
 }
 
-func New(auth client.AuthOptions, base string, duration time.Duration) *JiraService {
+func New(auth conf.AuthOptions, base string, duration time.Duration) *JiraService {
 	c := http.Client{
 		Timeout: duration,
 	}
